@@ -1,90 +1,67 @@
 # arellan-status-dashboard
 
-Dashboard público de estado operativo del ecosistema digital de la Clínica Automotriz Arellan Hnos. Muestra si los servicios están activos, historial de incidentes y tiempo de respuesta de la API.
+Dashboard publico de estado operativo del ecosistema digital de la Clinica Automotriz Arellan Hnos. Muestra en tiempo real si los servicios estan activos, el historial de incidentes, y el tiempo de respuesta de la API.
 
-## Descripción
+## Como funciona
 
-`arellan-status-dashboard` es la página de transparencia operativa del sistema. Cualquier persona — cliente, mecánico, o el equipo técnico — puede consultar si los servicios digitales están funcionando correctamente. Es un producto **completamente independiente** del resto del ecosistema: puede estar disponible incluso cuando los demás servicios están en mantenimiento.
+`arellan-status-dashboard` usa [Upptime](https://upptime.js.org), un monitor de uptime open-source basado en GitHub Actions. Cada 5 minutos, un workflow de GitHub realiza peticiones HTTP a los endpoints de cada servicio. Si un servicio no responde, se genera un issue automatico en este repositorio y la pagina de estado se actualiza reflejando la caida. Cuando el servicio se recupera, el issue se cierra automaticamente y el uptime se recalcula.
 
-## Por qué es un repo independiente
+### Flujo de incidentes
 
-- Puede operar cuando el sistema principal está en mantenimiento
-- Requiere un dominio separado (`status.arellan.pe`)
-- Su audiencia es distinta: clientes y equipo técnico
-- Herramienta crítica para comunicar incidencias sin acceso al sistema principal
-- Stack diferente: máxima simplicidad y disponibilidad
+1. GitHub Action ejecuta un health check cada 5 minutos
+2. Si un endpoint falla, se abre un Issue con los detalles
+3. La pagina estatica (`gh-pages`) se regenera con el nuevo estado
+4. Cuando el servicio vuelve, el Issue se cierra y el porcentaje de uptime se actualiza
 
-## Stack Tecnológico
+## Servicios monitoreados
 
-**MVP:** Upptime (GitHub-hosted, costo $0)
-- Powered by GitHub Actions
-- Checks automáticos de uptime cada 5 minutos
-- Historial de incidentes en GitHub Issues
-- Página estática generada automáticamente
+| Servicio | Endpoint | Descripcion |
+|---|---|---|
+| API Principal | `https://api.arellan.pe/health` | Backend NestJS — health check |
+| Panel Administrativo | `https://app.arellan.pe` | Frontend web administrativo |
+| Portal Clientes | `https://cliente.arellan.pe` | Portal publico de clientes |
+| App Gerencial | `https://mobile.arellan.pe` | PWA gerencial movil |
+| App Taller | `https://taller.arellan.pe` | Interfaz de mecanicos |
 
-**Fase 2 (si se requiere más control):** Next.js estático + API proxy con caché agresivo
+## Informacion mostrada
 
-## Servicios Monitoreados
-
-| Servicio | URL monitorizada | Descripción |
-|---------|-----------------|-------------|
-| API Principal | `https://api.arellan.pe/health` | Backend NestJS |
-| Portal Administrativo | `https://app.arellan.pe` | Frontend web admin |
-| Portal Clientes | `https://cliente.arellan.pe` | Portal público |
-| App Gerencial | `https://mobile.arellan.pe` | PWA móvil |
-| App Taller | `https://taller.arellan.pe` | Mechanic UI |
-| Base de Datos | Check interno vía API | PostgreSQL + Supabase |
-
-## Información Mostrada
-
-- **Uptime** de cada servicio (último 30 días, porcentaje)
-- **Tiempo de respuesta** promedio de la API
-- **Historial de incidentes** con fecha, descripción y resolución
-- **Estado actual** — operativo / degradado / caído
+- **Estado actual** — operativo / degradado / caido
+- **Uptime** — porcentaje de disponibilidad (ultimos 30 dias)
+- **Tiempo de respuesta** promedio por endpoint
+- **Historial de incidentes** con fecha, descripcion y tiempo de resolucion
 - **Mantenimientos programados** con aviso anticipado
 
-## Configuración Upptime (`.upptimerc.yml`)
+## Stack
 
-```yaml
-owner: arellan-tech
-repo: arellan-status-dashboard
-sites:
-  - name: API Principal
-    url: https://api.arellan.pe/health
-  - name: Portal Administrativo
-    url: https://app.arellan.pe
-  - name: Portal Clientes
-    url: https://cliente.arellan.pe
-  - name: App Taller (Mechanic UI)
-    url: https://taller.arellan.pe
-status-website:
-  cname: status.arellan.pe
-  name: Arellan Hnos — Estado del Sistema
-  introTitle: Estado de los servicios digitales
-  introMessage: Esta página muestra el estado en tiempo real de la plataforma digital de la Clínica Automotriz Arellan Hnos.
-```
+- **Upptime** como motor de monitoreo
+- **GitHub Actions** para ejecutar los checks cada 5 minutos
+- **GitHub Pages** (`gh-pages`) para servir la pagina estatica
+- Costo: **$0/mes**
 
-## Alertas de Incidentes
+## Setup
 
-Cuando un servicio cae:
-1. GitHub Action detecta el error en el check periódico
-2. Se crea un Issue automático en este repo con el detalle
-3. La página de status se actualiza automáticamente
-4. Se envía notificación por email al equipo técnico
+1. Clonar este repositorio
+2. Verificar que `.upptimerc.yml` tenga los endpoints correctos
+3. Habilitar GitHub Pages en la rama `gh-pages` desde Settings > Pages
+4. Configurar el CNAME `status.arellan.pe` en el proveedor DNS
+5. El workflow se ejecuta automaticamente al hacer push a `main`
+
+### Variables de entorno requeridas
+
+| Variable | Proposito |
+|---|---|
+| `GH_PAT` | Personal Access Token para crear/cerrar issues y desplegar a `gh-pages` |
+
+Agregarla en Settings > Secrets and variables > Actions.
 
 ## Dominio
 
-`status.arellan.pe` — Público, sin autenticación. Siempre accesible.
+`status.arellan.pe` — publico, sin autenticacion, siempre accesible incluso si los demas servicios estan caidos.
 
-## Repos Relacionados
+## Repos relacionados
 
-- `arellan-platform` — Expone el endpoint `/health` que este dashboard monitorea
-- `arellan-infrastructure` — Alertas de CloudWatch/Grafana complementarias
-
-## Costo
-
-- **MVP con Upptime:** $0/mes (GitHub Actions + GitHub Pages)
-- **Fase 2 con Next.js:** incluido en plan de Vercel
+- `arellan-platform` — expone el endpoint `/health` monitoreado
+- `arellan-infrastructure` — alertas complementarias de CloudWatch/Grafana
 
 ## Licencia
 

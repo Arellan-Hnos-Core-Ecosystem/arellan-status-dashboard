@@ -1,0 +1,50 @@
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [uptime]
+
+jobs:
+  update:
+    name: Update
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Run Upptime
+        uses: upptime/uptime-monitor@v1
+        with:
+          PAT: ${{ secrets.GH_PAT || github.token }}
+        env:
+          GH_PAT: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Update static site (history)
+        if: always()
+        uses: upptime/uptime-monitor@v1
+        with:
+          command: "site"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Deploy to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GH_PAT || github.token }}
+          publish_dir: ./status/__sapper__/export/status.arellan.pe
+          cname: status.arellan.pe
+          force_orphan: true
+          user_name: "arellan-tech"
+          user_email: "tech@arellan.pe"

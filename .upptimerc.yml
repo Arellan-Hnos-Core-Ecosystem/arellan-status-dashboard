@@ -1,0 +1,51 @@
+owner: arellan-tech
+repo: arellan-status-dashboard
+
+sites:
+  - name: API Principal
+    url: https://api.arellan.pe/health
+  - name: Panel Administrativo
+    url: https://app.arellan.pe
+  - name: Portal Clientes
+    url: https://cliente.arellan.pe
+  - name: App Gerencial
+    url: https://mobile.arellan.pe
+  - name: App Taller
+    url: https://taller.arellan.pe
+
+status-website:
+  cname: status.arellan.pe
+  name: Arellan Hnos — Estado del Sistema
+  introTitle: Estado de los servicios digitales
+  introMessage: Esta pagina muestra el estado en tiempo real de la plataforma digital de la Clinica Automotriz Arellan Hnos.
+  theme: dark
+  navbar:
+    - title: Estado
+      href: /
+    - title: Panel Admin
+      href: https://app.arellan.pe
+    - title: Portal Clientes
+      href: https://cliente.arellan.pe
+
+i18n:
+  footer: © 2026 Arellan Hnos. Todos los derechos reservados.
+
+assignees:
+  - arellan-tech
+
+skipDescriptionUpdate: true
+skipTopicsUpdate: true
+skipHomepageUpdate: true
+
+commitMessages:
+  commitAuthorName: "arellan-tech"
+  commitAuthorEmail: "tech@arellan.pe"
+
+workflowSchedule:
+  graphs: "0 0 * * *"
+  responseTime: "0 23 * * *"
+  staticSite: "0 1 * * *"
+  summary: "0 0 * * *"
+  updateTemplate: "0 0 * * *"
+  updates: "0 3 * * *"
+  uptime: "*/5 * * * *"
