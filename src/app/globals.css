@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* El preflight de Tailwind solo emite -webkit-text-size-adjust; se declara
+   tambien la propiedad estandar para Firefox/Edge modernos */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   @apply bg-gray-50 text-gray-900 antialiased;
 }
